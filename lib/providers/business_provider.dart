@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/business.dart';
+import '../services/business_service.dart';
 
 enum BusinessState { 
   initial, 
@@ -10,6 +11,10 @@ enum BusinessState {
 }
 
 class BusinessProvider with ChangeNotifier {
+  final BusinessService _businessService;
+
+  BusinessProvider(this._businessService);
+
   BusinessState _state = BusinessState.initial;
   List<Business> _businesses = [];
   String? _errorMessage;
@@ -32,25 +37,28 @@ class BusinessProvider with ChangeNotifier {
     }
   }
 
-  // Mock method for now - will be implemented with service in next commit
+  // Load businesses with proper service integration
   Future<void> loadBusinesses({bool forceRefresh = false}) async {
-    _setState(BusinessState.loading);
-    
-    // Simulate loading delay
-    await Future.delayed(const Duration(seconds: 1));
-    
-    // Mock data for testing state management
-    _businesses = [
-      const Business(
-        id: '1',
-        name: 'Sample Business',
-        location: 'Sample Location',
-        contactNumber: '+1 234 567 8900',
-      ),
-    ];
-    
-    _errorMessage = null;
-    _setState(BusinessState.loaded);
+    try {
+      _setState(BusinessState.loading);
+      
+      final businesses = await _businessService.getBusinesses(forceRefresh: forceRefresh);
+      
+      _businesses = businesses;
+      _errorMessage = null;
+      
+      if (businesses.isEmpty) {
+        _setState(BusinessState.empty);
+      } else {
+        _setState(BusinessState.loaded);
+      }
+    } on BusinessServiceException catch (e) {
+      _errorMessage = e.message;
+      _setState(BusinessState.error);
+    } catch (e) {
+      _errorMessage = 'An unexpected error occurred: ${e.toString()}';
+      _setState(BusinessState.error);
+    }
   }
 
   // Retry loading

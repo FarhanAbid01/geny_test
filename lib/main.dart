@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/business_provider.dart';
+import 'services/business_service.dart';
 
 void main() {
   runApp(const GennyTestApp());
@@ -11,8 +12,17 @@ class GennyTestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => BusinessProvider(),
+    return MultiProvider(
+      providers: [
+        Provider<BusinessService>(
+          create: (_) => BusinessService(),
+        ),
+        ChangeNotifierProvider<BusinessProvider>(
+          create: (context) => BusinessProvider(
+            context.read<BusinessService>(),
+          ),
+        ),
+      ],
       child: MaterialApp(
         title: 'Genny Test - Business Directory',
         debugShowCheckedModeBanner: false,
@@ -66,8 +76,15 @@ class ScaffoldScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => provider.loadBusinesses(),
-                  child: const Text('Test State Management'),
+                  child: const Text('Load Business Data'),
                 ),
+                if (provider.businesses.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loaded ${provider.businesses.length} businesses',
+                    style: const TextStyle(color: Colors.green),
+                  ),
+                ],
               ],
             ),
           );
