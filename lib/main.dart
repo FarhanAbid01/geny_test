@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/business_provider.dart';
 
 void main() {
   runApp(const GennyTestApp());
@@ -9,15 +11,18 @@ class GennyTestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Genny Test - Business Directory',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => BusinessProvider(),
+      child: MaterialApp(
+        title: 'Genny Test - Business Directory',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: const ScaffoldScreen(),
       ),
-      home: const ScaffoldScreen(),
     );
   }
 }
@@ -33,26 +38,40 @@ class ScaffoldScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.business,
-              size: 64,
-              color: Colors.grey,
+      body: Consumer<BusinessProvider>(
+        builder: (context, provider, child) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.business,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Business Directory',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Show state management working
+                Text(
+                  'State: ${provider.state.name}',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => provider.loadBusinesses(),
+                  child: const Text('Test State Management'),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            Text(
-              'Business Directory',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          
-          ],
-        ),
+          );
+        },
       ),
     );
   }
