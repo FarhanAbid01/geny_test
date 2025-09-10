@@ -71,6 +71,17 @@ class BusinessProvider with ChangeNotifier {
     await loadBusinesses(forceRefresh: true);
   }
 
+  // Clear cache and reload
+  Future<void> clearCacheAndReload() async {
+    try {
+      await _businessService.clearCache();
+      await loadBusinesses(forceRefresh: true);
+    } catch (e) {
+      _errorMessage = 'Failed to clear cache: ${e.toString()}';
+      _setState(BusinessState.error);
+    }
+  }
+
   void _setState(BusinessState newState) {
     if (_state != newState) {
       _state = newState;

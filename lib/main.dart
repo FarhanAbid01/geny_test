@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/business_provider.dart';
 import 'services/business_service.dart';
+import 'screens/business_list_screen.dart';
 
 void main() {
   runApp(const GennyTestApp());
@@ -28,68 +29,28 @@ class GennyTestApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          primaryColor: Colors.blue[700],
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.light,
+          ),
           useMaterial3: true,
-        ),
-        home: const ScaffoldScreen(),
-      ),
-    );
-  }
-}
-
-class ScaffoldScreen extends StatelessWidget {
-  const ScaffoldScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Genny Test'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
-      body: Consumer<BusinessProvider>(
-        builder: (context, provider, child) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.business,
-                  size: 64,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Business Directory',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Show state management working
-                Text(
-                  'State: ${provider.state.name}',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => provider.loadBusinesses(),
-                  child: const Text('Load Business Data'),
-                ),
-                if (provider.businesses.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    'Loaded ${provider.businesses.length} businesses',
-                    style: const TextStyle(color: Colors.green),
-                  ),
-                ],
-              ],
+          appBarTheme: AppBarTheme(
+            centerTitle: true,
+            elevation: 0,
+            backgroundColor: Colors.blue[700],
+            foregroundColor: Colors.white,
+          ),
+          cardTheme: CardThemeData(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-          );
-        },
+          ),
+        ),
+        home: const BusinessListScreen(),
       ),
     );
   }
 }
+

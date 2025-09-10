@@ -61,12 +61,28 @@ class BusinessService {
     
     final jsonString = await rootBundle.loadString('assets/data/businesses.json');
     
-    // Use Dio to create consistent response pattern (even with local data)
-    return Response(
-      data: jsonString,
-      statusCode: 200,
-      requestOptions: RequestOptions(path: 'assets/data/businesses.json'),
-    );
+    // Use Dio to create a consistent response pattern
+    return _dio.get(
+      'assets/data/businesses.json',
+      options: Options(
+        responseType: ResponseType.plain,
+        extra: {'mockData': jsonString}, // Pass data through extra for mock
+      ),
+    ).then((response) {
+      // Override response data with our local JSON
+      return Response(
+        data: jsonString,
+        statusCode: 200,
+        requestOptions: response.requestOptions,
+      );
+    }).catchError((error) {
+      // Fallback to manual response creation if Dio fails
+      return Response(
+        data: jsonString,
+        statusCode: 200,
+        requestOptions: RequestOptions(path: 'assets/data/businesses.json'),
+      );
+    });
   }
 
   Future<List<Business>> _getCachedBusinesses() async {
